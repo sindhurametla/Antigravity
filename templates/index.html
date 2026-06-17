@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Radar</title>
+    <meta name="description" content="Track, filter, and share the latest Google Cloud BigQuery release notes and updates.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Background Gradient Grids -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    
+    <div class="app-container">
+        <!-- Sidebar / Control Panel -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 6V12L16 14" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logo-grad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366f1" />
+                                <stop offset="1" stop-color="#3b82f6" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <div class="logo-text">
+                        <h1>BQ Radar</h1>
+                        <span>Release Tracker</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-controls">
+                <button id="btn-refresh" class="btn-primary" aria-label="Refresh release notes">
+                    <svg class="icon spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-.72" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Refresh Feed</span>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>Search & Filter</h2>
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search updates...">
+                </div>
+
+                <div class="filter-section">
+                    <h3>Filter by Type</h3>
+                    <div class="filter-chips" id="filter-container">
+                        <button class="chip active" data-filter="all">All Updates</button>
+                        <button class="chip" data-filter="Feature">
+                            <span class="dot dot-feature"></span> Features
+                        </button>
+                        <button class="chip" data-filter="Announcement">
+                            <span class="dot dot-announcement"></span> Announcements
+                        </button>
+                        <button class="chip" data-filter="Change">
+                            <span class="dot dot-change"></span> Changes
+                        </button>
+                        <button class="chip" data-filter="Issue">
+                            <span class="dot dot-issue"></span> Issues
+                        </button>
+                        <button class="chip" data-filter="Breaking">
+                            <span class="dot dot-breaking"></span> Breaking
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="sidebar-section stats-panel">
+                <h2>Stats Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card" data-stat="Feature">
+                        <span class="stat-value" id="stat-count-feature">0</span>
+                        <span class="stat-label">Features</span>
+                    </div>
+                    <div class="stat-card" data-stat="Announcement">
+                        <span class="stat-value" id="stat-count-announcement">0</span>
+                        <span class="stat-label">Announcements</span>
+                    </div>
+                    <div class="stat-card" data-stat="Change">
+                        <span class="stat-value" id="stat-count-change">0</span>
+                        <span class="stat-label">Changes</span>
+                    </div>
+                    <div class="stat-card" data-stat="Issue">
+                        <span class="stat-value" id="stat-count-issue">0</span>
+                        <span class="stat-label">Issues</span>
+                    </div>
+                    <div class="stat-card" data-stat="Breaking">
+                        <span class="stat-value" id="stat-count-breaking">0</span>
+                        <span class="stat-label">Breaking</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>Data source: <a href="https://docs.cloud.google.com/feeds/bigquery-release-notes.xml" target="_blank" rel="noopener">BigQuery RSS Feed</a></p>
+                <p class="copyright">&copy; 2026 BQ Radar</p>
+            </div>
+        </aside>
+
+        <!-- Main Feed Panel -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-info">
+                    <h1>BigQuery Release Notes</h1>
+                    <p id="feed-status">Syncing real-time changes...</p>
+                </div>
+            </div>
+            </header>
+
+            <div class="feed-viewport">
+                <!-- Loading state -->
+                <div id="loading-state" class="loading-state">
+                    <div class="radar-scan">
+                        <div class="circle c1"></div>
+                        <div class="circle c2"></div>
+                        <div class="circle c3"></div>
+                        <div class="scan-line"></div>
+                    </div>
+                    <p>Scanning for BigQuery updates...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="error-state hidden">
+                    <svg class="error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h2>Failed to Load Notes</h2>
+                    <p id="error-message">Something went wrong while fetching the release notes. Please check your network or try again later.</p>
+                    <button id="btn-retry" class="btn-secondary">Retry Connection</button>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state hidden">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h2>No Updates Found</h2>
+                    <p>No release notes match your active filters or search term.</p>
+                    <button id="btn-clear-filters" class="btn-secondary">Clear Filters</button>
+                </div>
+
+                <!-- Feed Content (Populated by JS) -->
+                <div id="feed-container" class="feed-timeline hidden">
+                    <!-- Dynamic updates loaded here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Slide-out Tweet Composer Drawer -->
+        <aside id="tweet-composer-drawer" class="composer-drawer">
+            <div class="drawer-backdrop" id="composer-backdrop"></div>
+            <div class="drawer-content">
+                <div class="drawer-header">
+                    <div class="drawer-title-group">
+                        <svg class="tweet-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <h2>Tweet Composer</h2>
+                    </div>
+                    <button class="btn-close" id="btn-close-drawer" aria-label="Close composer">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="drawer-body">
+                    <div class="selected-update-preview">
+                        <div class="preview-badge" id="preview-badge">Feature</div>
+                        <span class="preview-date" id="preview-date">June 15, 2026</span>
+                        <div class="preview-text" id="preview-text">Selected update content will load here...</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tweet-textarea">Customize Draft:</label>
+                        <textarea id="tweet-textarea" rows="8" maxlength="500" placeholder="Write your tweet here..."></textarea>
+                        <div class="textarea-actions">
+                            <span class="char-counter" id="char-counter">0 / 280</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-footer">
+                    <button id="btn-copy-tweet" class="btn-secondary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m-6 4h6m-6 4h6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Copy Draft</span>
+                    </button>
+                    <button id="btn-share-tweet" class="btn-primary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                        <span>Tweet on X</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <span id="toast-message">Copied to clipboard!</span>
+    </div>
+
+    <!-- Main JavaScript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
